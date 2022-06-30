@@ -15,6 +15,7 @@ func initOptions() {
 	options["mode"] = ""
 	options["work-mode"] = ""
 	options["port"] = ""
+	options["cluster-port"] = ""
 	options["cluster-map"] = ""
 }
 
