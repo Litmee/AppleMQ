@@ -1,7 +1,9 @@
 package apple
 
 import (
+	"AppleMQ/treaty"
 	"net"
+	"sync"
 	"time"
 )
 
@@ -13,6 +15,11 @@ var clusterMQArr []*clusterMQ
 
 // The set of surviving cluster connections
 var clusterMQAliveArr []*clusterMQ
+
+var FailLock sync.Mutex
+
+// Synchronization failure message collection
+var failureMessageCollection = make(map[string][][]byte)
 
 type clusterMQ struct {
 	id       int32
@@ -34,6 +41,28 @@ func connection(i int, addr string) {
 		clusterMQArr[i].c = conn
 		clusterMQArr[i].state = 1
 		clusterMQArr[i].trying = false
+		s, _ := treaty.Encode("send")
+		conn.Write(s)
+
+		FailLock.Lock()
+		// Handle possible previously unsent messages
+		f, ok := failureMessageCollection[addr]
+		if ok {
+			var newF [][]byte
+			for i, v := range f {
+				_, err = conn.Write(v)
+				if err != nil {
+					break
+				}
+				newF = f[i+1:]
+			}
+			if len(newF) > 0 {
+				failureMessageCollection[addr] = newF
+			} else {
+				delete(failureMessageCollection, addr)
+			}
+		}
+		FailLock.Unlock()
 		break
 	}
 }
