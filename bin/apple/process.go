@@ -1,11 +1,14 @@
 package apple
 
 import (
+	"AppleMQ/queue"
 	"AppleMQ/treaty"
 	"bufio"
 	"log"
 	"net"
 )
+
+var globalQueue = queue.NewQueue()
 
 func process(c net.Conn) {
 
@@ -16,13 +19,31 @@ func process(c net.Conn) {
 			return
 		}
 	}(c)
-
-	for {
+	// Read the first launch identification information
+	s, err := treaty.Decode(bufio.NewReader(c))
+	if err != nil {
+		log.Printf("read from conn failed, err:%v\n", err)
+		return
+	}
+	var sign bool
+	if string(s) == "send" {
+		sign = true
+	}
+	for sign {
 		s, err := treaty.Decode(bufio.NewReader(c))
 		if err != nil {
 			log.Printf("read from conn failed, err:%v\n", err)
 			break
 		}
-		log.Println("接收到的数据:", s)
+		go dealMessage(s)
+	}
+	for !sign {
+		m := globalQueue.Take()
+		m, _ = treaty.Encode(string(m))
+		_, err := c.Write(m)
+		if err != nil {
+			break
+		}
+		globalQueue.DeleteHead()
 	}
 }
