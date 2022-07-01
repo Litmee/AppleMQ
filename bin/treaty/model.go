@@ -32,7 +32,7 @@ func Encode(m string) ([]byte, error) {
 }
 
 // Decode message decoding
-func Decode(r *bufio.Reader) (string, error) {
+func Decode(r *bufio.Reader) ([]byte, error) {
 
 	// 1. Read the first 4 bytes of data, and get the content length of the message, reading in Peek mode will not clear the cache
 	lByte, _ := r.Peek(4)
@@ -45,22 +45,22 @@ func Decode(r *bufio.Reader) (string, error) {
 	// 3. Read the contents of buffer into the l variable
 	err := binary.Read(buffer, binary.LittleEndian, &l)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	// 4. Return the current number of readable bytes in the buffer through the Buffered method,
 	// which was previously read using Peek, so the data content here should be greater than l+4
 	if int32(r.Buffered()) < l+4 {
-		return "", err
+		return nil, err
 	}
 
 	// 5. read message entity
 	s := make([]byte, l+4)
 	_, err = r.Read(s)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	// 6. Returns the message string with the length flag removed
-	return string(s[4:]), nil
+	return s[4:], nil
 }
