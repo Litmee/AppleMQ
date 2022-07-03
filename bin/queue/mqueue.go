@@ -39,11 +39,11 @@ func (q *queue) Push(v []byte) {
 	if q.size == 0 {
 		q.head = e
 		q.tail = e
+		q.ch <- true
 	} else {
 		q.tail.next = e
 		q.tail = e
 	}
-	q.ch <- true
 	q.size++
 }
 
@@ -51,11 +51,14 @@ func (q *queue) Push(v []byte) {
 func (q *queue) Take() []byte {
 	q.l.RLocker()
 	defer q.l.RUnlock()
-	<-q.ch
+	if q.Size() == 0 {
+		<-q.ch
+	}
+	q.deleteHead()
 	return q.head.value
 }
 
-func (q *queue) DeleteHead() {
+func (q *queue) deleteHead() {
 	q.l.Lock()
 	defer q.l.Unlock()
 	q.head = q.head.next

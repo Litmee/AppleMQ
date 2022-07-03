@@ -12,6 +12,7 @@ func Run() {
 
 	// Start the service
 	listen, err := net.Listen("tcp", "127.0.0.1:"+options["port"])
+	log.Println("start port: ", options["port"])
 	if err != nil {
 		panic(err)
 	}

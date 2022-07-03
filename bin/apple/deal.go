@@ -10,10 +10,11 @@ import (
 // Synchronized cluster messages
 func separate(m []byte) {
 	b, _ := treaty.Encode(string(m))
-	for _, v := range clusterMQAliveArr {
+	for _, v := range clusterMQArr {
 		_, err := v.c.Write(b)
 		if err != nil {
 			v.state = 0
+			log.Println("Message synchronization failed")
 			FailLock.Lock()
 			s, ok := failureMessageCollection[v.addr]
 			if ok {
@@ -37,7 +38,9 @@ func dealMessage(m []byte) {
 		return
 	}
 	if info.Sign == 0 {
+		info.Sign = 1
+		marshal, _ := json.Marshal(info)
 		// Distribute messages to other cluster nodes
-		go separate(m)
+		go separate(marshal)
 	}
 }

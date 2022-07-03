@@ -35,6 +35,7 @@ func process(c net.Conn) {
 			log.Printf("read from conn failed, err:%v\n", err)
 			break
 		}
+		log.Println("MQ received the news: ", string(s))
 		go dealMessage(s)
 	}
 	for !sign {
@@ -44,6 +45,5 @@ func process(c net.Conn) {
 		if err != nil {
 			break
 		}
-		globalQueue.DeleteHead()
 	}
 }
