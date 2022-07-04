@@ -4,7 +4,7 @@ import (
 	"strings"
 )
 
-func checkAndDealOption() {
+func checkAndDealOption() bool {
 
 	// Processing of mode configuration items
 	mode := options["mode"]
@@ -15,7 +15,9 @@ func checkAndDealOption() {
 	// If it is a cluster deployment, further processing is required
 	if mode == "cluster" {
 		dealModeCluster()
+		return true
 	}
+	return false
 }
 
 func dealModeCluster() {
