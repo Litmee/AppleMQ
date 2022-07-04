@@ -18,7 +18,7 @@ func Run() {
 	}
 
 	// Check and process the value of a configuration item
-	checkAndDealOption()
+	ok := checkAndDealOption()
 
 	for {
 		conn, err := listen.Accept()
@@ -27,6 +27,10 @@ func Run() {
 			continue
 		}
 		// Start a separate goroutine to handle the connection
-		go process(conn)
+		if ok {
+			go processCluster(conn)
+		} else {
+			go processStandalone(conn)
+		}
 	}
 }
