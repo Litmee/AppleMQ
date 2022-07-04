@@ -2,6 +2,7 @@ package apple
 
 import (
 	"AppleMQ/treaty"
+	"log"
 	"net"
 	"sync"
 	"time"
@@ -33,7 +34,13 @@ type clusterMQ struct {
 
 func connection(i int, addr string) {
 	for {
-		conn, err := net.Dial("tcp", addr)
+		d, err := net.ResolveTCPAddr("tcp", addr)
+		if err != nil {
+			log.Println("ResolveTCPAddr err: ", err)
+			break
+		}
+
+		conn, err := net.DialTCP("tcp", nil, d)
 		if err != nil {
 			time.Sleep(time.Second * 1)
 			continue
@@ -42,19 +49,22 @@ func connection(i int, addr string) {
 		clusterMQArr[i].state = 1
 		clusterMQArr[i].trying = false
 		s, _ := treaty.Encode("send")
-		conn.Write(s)
-
+		_, err = conn.Write(s)
+		if err != nil {
+			break
+		}
+		// Sync messages
 		FailLock.Lock()
 		// Handle possible previously unsent messages
 		f, ok := failureMessageCollection[addr]
 		if ok {
 			var newF [][]byte
-			for i, v := range f {
+			for j, v := range f {
 				_, err = conn.Write(v)
 				if err != nil {
 					break
 				}
-				newF = f[i+1:]
+				newF = f[j+1:]
 			}
 			if len(newF) > 0 {
 				failureMessageCollection[addr] = newF
