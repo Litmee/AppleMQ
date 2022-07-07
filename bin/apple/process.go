@@ -9,6 +9,7 @@ import (
 	"time"
 )
 
+// Global queue parameters
 var globalQueue = queue.NewQueue()
 
 func processStandalone(c net.Conn) {
