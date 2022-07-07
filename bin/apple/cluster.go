@@ -28,8 +28,8 @@ type clusterMQ struct {
 	addr     string
 	c        net.Conn
 	trying   bool
+	state    int8
 	// state: 1 means the connection is alive, 0 means the connection is dead
-	state int8
 }
 
 func connection(i int, addr string) {
