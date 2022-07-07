@@ -56,11 +56,12 @@ func (q *queue) Take() []byte {
 	if q.Size() == 0 {
 		<-q.ch
 	}
-	q.deleteHead()
+	q.removeHead()
 	return q.head.value
 }
 
-func (q *queue) deleteHead() {
+// remove header information
+func (q *queue) removeHead() {
 	q.l.Lock()
 	defer q.l.Unlock()
 	q.head = q.head.next
