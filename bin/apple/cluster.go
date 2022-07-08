@@ -46,8 +46,10 @@ func connection(i int, addr string) {
 			continue
 		}
 		clusterMQArr[i].c = conn
+		// Modify the connection status flag
 		clusterMQArr[i].state = 1
 		clusterMQArr[i].trying = false
+		// Send the first frame of data to identify whether the connection is used to receive or send messages
 		s, _ := treaty.Encode("send")
 		_, err = conn.Write(s)
 		if err != nil {
