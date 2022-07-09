@@ -34,7 +34,7 @@ func Encode(m string) ([]byte, error) {
 // Decode message decoding
 func Decode(r *bufio.Reader) ([]byte, error) {
 
-	// Identification parameters used to solve TCP packetization problems
+	// Identification parameters used to solve TCP subcontract problems
 	var sign int32 = 0
 
 	// 1. Read the first 4 bytes of data, and get the content length of the message, reading in Peek mode will not clear the cache
