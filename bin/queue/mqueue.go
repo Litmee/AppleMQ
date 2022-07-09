@@ -13,6 +13,7 @@ func newElement(v []byte) *element {
 	return &element{value: v}
 }
 
+// queue structure
 type queue struct {
 	head *element
 	tail *element
@@ -25,6 +26,7 @@ func NewQueue() *queue {
 	return &queue{head: nil, tail: nil, l: new(sync.RWMutex), size: 0, ch: make(chan bool, 100)}
 }
 
+// Size Get the number of messages in the current queue
 func (q *queue) Size() int64 {
 	q.l.RLock()
 	defer q.l.RUnlock()
@@ -54,11 +56,12 @@ func (q *queue) Take() []byte {
 	if q.Size() == 0 {
 		<-q.ch
 	}
-	q.deleteHead()
+	q.removeHead()
 	return q.head.value
 }
 
-func (q *queue) deleteHead() {
+// remove header information
+func (q *queue) removeHead() {
 	q.l.Lock()
 	defer q.l.Unlock()
 	q.head = q.head.next
