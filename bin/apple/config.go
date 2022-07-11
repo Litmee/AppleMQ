@@ -4,6 +4,7 @@ import (
 	"strings"
 )
 
+// Check and handle configuration items
 func checkAndDealOption() bool {
 
 	// Processing of mode configuration items
@@ -20,6 +21,7 @@ func checkAndDealOption() bool {
 	return false
 }
 
+// Handling cluster deployments
 func dealModeCluster() {
 	// Get the value of a cluster configuration item
 	cluster := options["cluster-map"]
