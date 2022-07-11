@@ -72,6 +72,7 @@ func processCluster(c net.Conn) {
 		return
 	}
 	var sign bool
+	// Determine the first frame identification data
 	if string(s) == "send" {
 		sign = true
 	}
