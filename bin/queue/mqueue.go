@@ -54,6 +54,7 @@ func (q *queue) Take() []byte {
 	q.l.RLocker()
 	defer q.l.RUnlock()
 	if q.Size() == 0 {
+		// Block when there is no data in the queue
 		<-q.ch
 	}
 	q.removeHead()
@@ -66,6 +67,7 @@ func (q *queue) removeHead() {
 	defer q.l.Unlock()
 	q.head = q.head.next
 	q.size--
+	// If the queue size is 0 after removal, set the tail element to nil
 	if q.size == 0 {
 		q.tail = nil
 	}
