@@ -21,6 +21,7 @@ func Run() {
 	ok := checkAndDealOption()
 
 	for {
+		// listen for connections
 		conn, err := listen.Accept()
 		if err != nil {
 			log.Println("accept failed, err:%V\n", err)
