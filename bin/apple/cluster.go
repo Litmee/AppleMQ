@@ -71,6 +71,7 @@ func connection(i int, addr string) {
 			if len(newF) > 0 {
 				failureMessageCollection[addr] = newF
 			} else {
+				// After the synchronization is complete, delete the corresponding value in the map
 				delete(failureMessageCollection, addr)
 			}
 		}
